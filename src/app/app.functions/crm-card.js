@@ -33,6 +33,14 @@ exports.main = async (context = {}, sendResponse) => {
             type: "text",
             format: "markdown",
             text: `**Author**: ${data[0].a}`
+          },
+          {
+            "type": "alert",
+            "title": "Want to use search data directly from Google to inform your content strategy?",
+            "body": {
+              "type": "text",
+              "text": "Sign up for more information about the beta integration with Google Search Console"
+            }
           }
         ]
       },
