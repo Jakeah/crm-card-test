@@ -1,10 +1,10 @@
 {
     "type": "crm-card",
     "data": {
-      "title": "Important Details",
-      "location": "crm.record.tab",
+      "title": "Primary Contact",
+      "location": "crm.record.sidebar",
       "fetch": {
-        "targetFunction": "crm-card",
+        "targetFunction": "card-right-pane",
         "objectTypes": [
           {
             "name": "deals",
@@ -15,4 +15,4 @@
         ]
       }
     }
-  }
+}

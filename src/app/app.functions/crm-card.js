@@ -1,68 +1,182 @@
-// For external API calls
-const axios = require('axios');
-
+const hubspot = require('@hubspot/api-client');
+//Need to add code to render the card
 exports.main = async (context = {}, sendResponse) => {
-
-  // Store contact firstname, configured as propertiesToSend in crm-card.json
-  const { firstname } = context.propertiesToSend;
-
-  const introMessage = {
-    type: "text",
-    format: "markdown",
-    text: "_An example of a CRM card extension that displays data from Hubspot, uses ZenQuotes public API to display daily quote, and demonstrates custom actions using serverless functions._",
-  };
-
-  try {
-    const { data } = await axios.get("https://zenquotes.io/api/random");
-
-    const quoteSections = [
-      {
-        type: "tile",
-        body: [
-          {
-            type: "text",
-            format: "markdown",
-            text: `**Hello ${firstname}, here's your quote for the day**!`
-          },
-          {
-            type: "text",
-            format: "markdown",
-            text: `**Quote**: ${data[0].q}`
-          },
-          {
-            type: "text",
-            format: "markdown",
-            text: `**Author**: ${data[0].a}`
-          },
-          {
-            "type": "alert",
-            "title": "Want to use search data directly from Google to inform your content strategy?",
-            "body": {
-              "type": "text",
-              "text": "Sign up for more information about the beta integration with Google Search Console"
-            }
-          }
-        ]
-      },
-      {
-        type: "button",
-        text: "Get new quote",
-        onClick: {
-          type: "SERVERLESS_ACTION_HOOK",
-          serverlessFunction: "crm-card"
-        }
-      }
-    ];
-
-    sendResponse({ sections: [introMessage, ...quoteSections] });
-  } catch (error) {
-    // "message" will create an error feedback banner when it catches an error
+    console.log(context)
     sendResponse({
-      message: {
-        type: 'ERROR',
-        body: `Error: ${error.message}`
-      },
-      sections: [introMessage]
+      sections: [
+        {
+          type: 'text',
+          format: 'markdown',
+          text: 'View relevant data about specific deals',
+        },
+        {
+          "type": "buttonRow",
+          "buttons": [
+            {
+              type: 'button',
+              text: 'View all deals',
+              onClick: {
+                type: 'IFRAME',
+                // Width and height of the iframe (in pixels)
+                width: 1200,
+                height: 800,
+                uri: 'https://n.robertpainslie.com',
+              },
+          },
+          {
+            type: 'button',
+            text: 'Open iframe to view all deals',
+            onClick: {
+              type: 'IFRAME',
+              // Width and height of the iframe (in pixels)
+              width: 1200,
+              height: 800,
+              uri: 'https://www.robertpainslie.com/deal-table',
+            },
+          },
+          {
+              type: 'button',
+              text: 'Associate most recent note with all associated contacts',
+              onClick: {
+                  "type": "SERVERLESS_ACTION_HOOK",
+                  "serverlessFunction": "associate-engagements",
+                  "associatedObjectProperties": ["hs_object_id"]
+              },
+          },
+          {
+              type: 'button',
+              text: 'View Contact Embed',
+              onClick: {
+                type: 'IFRAME',
+                // Width and height of the iframe (in pixels)
+                width: 1200,
+                height: 800,
+                uri: 'https://app.hubspot.com/contact-timeline-embed/6137087/login?id=184551',
+              },
+          },
+            {
+              type: 'button',
+              text: 'View embedded Google Sheet',
+              onClick: {
+                type: 'IFRAME',
+                // Width and height of the iframe (in pixels)
+                width: 1200,
+                height: 800,
+                uri: `https://docs.google.com/spreadsheets/d/1YGL_ae_NizHJfUeOVF7I60wIuC8v5GHFSBCYRDSXvGM/edit#gid=0?hs_object_id=${context.propertiesToSend.hs_object_id}`,
+              },
+            }
+          ]
+        },
+        {
+            "type": "divider",
+            "distance": "small"
+        },
+        {
+          "type": "crm::objectProperty",
+          "objectTypeId":"contact",
+          "objectId": 365, //Update the ID and Object to a relevant example
+          "properties": [
+           "firstname",
+           "lastname",
+           "hubspot_owner_id",
+            "lifecyclestage",
+          ]
+         },
+         //should add component to edit properties of 'primary' contact
+        {
+            "type": "tile",
+            "content": [
+              {
+                "type": "text",
+                "text": `Trend of past deals:`
+              },
+              {
+                "type": "text",
+                "format": "markdown",
+                "text": `*Won:* 15\  
+ 
+            *Lost:* 7\  `
+              }
+            ]
+        },
+          {
+            "type": "statistics",
+            "items": [
+             {
+              "label": "Next Recommended Action",
+              "number": "Pitch upgrade opportunity for Product X"
+             },
+             {
+              "label": "Sold Amount L30 Days",
+              "number": "203",
+              "description": {
+                "type": "trend",
+                "value": "23.36%",
+                "direction": "increase"
+                }
+              },
+              {
+                "label": "Top Product Sold",
+                "number": "Product 1",
+             }
+            ]
+        },       
+        {
+            "type": "divider",
+            "distance": "small"
+        },
+        {
+          "type": "crm::report",
+          "reportId": 83304448
+         },
+         {
+          "type": "crm::report",
+          "reportId": 83304446
+         },/*
+         {
+          "type": "crm::report",
+          "reportId": 91454862
+         },*/
+        {
+            "type": "descriptionList",
+            "items": [
+              {
+                "label": "Recommended Promotion",
+                "value": `abc-123 promotion \   
+                some new line \  
+                another new line`
+              },
+              {
+                "label": "Recommended Promotion",
+                "value": "asdf-456 promotion"
+              },
+              {
+                "label": "Recommended Promotion",
+                "value": {
+                  "type": "text",
+                  "format": "markdown",
+                  "text": "[View Promotion Details for promotion qwerty-456](https://app.hubspot.com/contacts/20511963/deal/11782185387)"
+                }
+              }
+            ]
+          },
+          {
+            type: 'text',
+            format: 'markdown',
+            text: 'High Value Open Deals',
+          },  
+        {
+            "type": "crm::propertyList",
+            "objectTypeId": "tickets",
+            "objectId": "1392578585", //update ticket id
+            "properties": ["subject","hs_pipeline_stage","content"]
+        },
+        {
+            type: 'text',
+            format: 'markdown',
+            text: `Available 'context' data for development debugging: \   
+             ${JSON.stringify(context)}`,
+        },
+      ],
     });
-  }
-};
+  };
