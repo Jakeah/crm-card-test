@@ -75,7 +75,7 @@ exports.main = async (context = {}, sendResponse) => {
         {
           "type": "crm::objectProperty",
           "objectTypeId":"contact",
-          "objectId": 365, //Update the ID and Object to a relevant example
+          "objectId": 4951, //Update the ID and Object to a relevant example
           "properties": [
            "firstname",
            "lastname",
