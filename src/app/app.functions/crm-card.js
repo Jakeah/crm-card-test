@@ -9,6 +9,7 @@ exports.main = async (context = {}, sendResponse) => {
           format: 'markdown',
           text: 'View relevant data about specific deals',
         },
+
         {
           "type": "buttonRow",
           "buttons": [
